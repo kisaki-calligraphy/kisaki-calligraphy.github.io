@@ -24,9 +24,23 @@ const translations = {
     artwork6_title: "Dawn",
     artwork6_meta: "Ink on washi · 2022",
     about_title: "About",
-    about_p1: "Kisaki is a contemporary calligraphy artist whose work bridges the ancient traditions of East Asian brush art with modern sensibility. Each stroke is a meditation, each composition a quiet conversation between ink, paper, and the present moment.",
-    about_p2: "Working primarily with sumi ink on washi and silk, Kisaki's pieces explore themes of impermanence, presence, and the beauty found in simplicity. The practice is rooted in the Japanese concept of ma — the power of negative space.",
-    about_p3: "Kisaki has exhibited in galleries across Japan, France, and the United States, and accepts commissions for private collections and public spaces.",
+    about_text: `Calligraphy Artist - Kisaki -
+
+"The soul is mirrored in one’s handwriting." This is a belief held dear in Japan since ancient times.
+As a child, I was reserved and found it difficult to express my emotions.
+But at the age of three, I discovered Shodo—Japanese calligraphy. 
+When I held a brush, I finally found a way to express myself freely, letting my feelings flow into every stroke.
+
+Calligraphy is a mysterious art; the final piece changes depending on one’s state of mind and circumstances.
+
+Some days, the strokes are bold and dynamic. Other days, the lines are delicate and fine. 
+There are days when the brush glides across the paper with effortless grace.
+And then, there are days when the brush simply refuses to move. It is this profound depth that fascinates me, and I am dedicated to sharing the beauty of Shodo with the world.
+In calligraphy and art, there is no "correct" way, nor are there fixed models to follow. There is no "good" or "bad." 
+
+I believe that simply enjoying the process and creating from the heart is one of the truest ways to express one's soul. 
+
+My hope is that calligraphy art becomes something that people of all generations and nationalities can feel close to and enjoy.`,
     contact_title: "Contact",
     contact_email_label: "Email",
     contact_instagram_label: "Instagram",
@@ -53,9 +67,24 @@ const translations = {
     artwork6_title: "夜明け",
     artwork6_meta: "墨・和紙 · 2022年",
     about_title: "プロフィール",
-    about_p1: "妃（キサキ）は、東アジアの書道の伝統と現代的な感性を融合させた書道アーティストです。一筆一筆が瞑想であり、それぞれの作品は墨、紙、そして現在という瞬間との静かな対話です。",
-    about_p2: "主に墨汁と和紙・絹を使用し、無常、存在、そしてシンプルさの中に見出される美しさをテーマに作品を制作しています。その表現は日本の「間」の概念、すなわち余白が持つ力に根ざしています。",
-    about_p3: "日本、フランス、アメリカ各地のギャラリーで展示を行い、個人コレクションや公共空間へのコミッションも承っています。",
+    about_text: `書道アーティスト妃 - Kisaki -
+
+
+"文字にはその人の魂が映し出される"日本では古くから言われています。
+幼いころはあまり自分を前に出さず、自分の感情を表現することが苦手だった私は、
+三歳の頃に「書道」と出会い、筆を持つ時は自分の思うように文字として自分を表現できました。
+書は不思議なもので、その時の心の在り方や状況で、違った仕上がりになります。
+
+ダイナミックに書ける日
+繊細な線で書く日
+何を書いても気持ち良くさらさらと書ける日
+
+逆に、全く筆が進まない日もあります。
+とても奥が深く、是非多くの方に書道の魅力を知ってもらいたく活動しております。
+書やアートに見本や正解はありません。
+上手い下手もありません。
+心のままに楽しむことが、自分の魂を表現できる方法の一つだと考えています。
+書道アートが様々な世代、国籍の方にも親しみやすくなっていただけると嬉しいです。`,
     contact_title: "お問い合わせ",
     contact_email_label: "メール",
     contact_instagram_label: "インスタグラム",
