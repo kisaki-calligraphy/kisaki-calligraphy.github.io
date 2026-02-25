@@ -69,6 +69,9 @@ My hope is that calligraphy art becomes something that people of all generations
 };
 
 let currentLang = localStorage.getItem("kisaki_lang") || "en";
+let lightboxElements = null;
+let galleryImageElements = [];
+let activeLightboxIndex = -1;
 
 function applyTranslations(lang) {
   const t = translations[lang];
@@ -93,6 +96,128 @@ function setLang(lang) {
   });
 }
 
+function initializeLightbox() {
+  if (lightboxElements) return lightboxElements;
+
+  const overlay = document.createElement("div");
+  overlay.className = "lightbox-overlay";
+  overlay.setAttribute("aria-hidden", "true");
+
+  const frame = document.createElement("div");
+  frame.className = "lightbox-frame";
+
+  const image = document.createElement("img");
+  image.className = "lightbox-image";
+  image.alt = "Enlarged artwork";
+  image.draggable = false;
+
+  const prevButton = document.createElement("button");
+  prevButton.type = "button";
+  prevButton.className = "lightbox-nav lightbox-prev";
+  prevButton.setAttribute("aria-label", "Previous image");
+  prevButton.textContent = "‹";
+
+  const nextButton = document.createElement("button");
+  nextButton.type = "button";
+  nextButton.className = "lightbox-nav lightbox-next";
+  nextButton.setAttribute("aria-label", "Next image");
+  nextButton.textContent = "›";
+
+  frame.appendChild(prevButton);
+  frame.appendChild(image);
+  frame.appendChild(nextButton);
+  overlay.appendChild(frame);
+  document.body.appendChild(overlay);
+
+  const showImageAtIndex = (index) => {
+    if (!galleryImageElements.length) return;
+    activeLightboxIndex = (index + galleryImageElements.length) % galleryImageElements.length;
+    const sourceImage = galleryImageElements[activeLightboxIndex];
+    image.src = sourceImage.src;
+    image.alt = sourceImage.alt || "Enlarged artwork";
+  };
+
+  const closeLightbox = () => {
+    overlay.classList.remove("open");
+    overlay.setAttribute("aria-hidden", "true");
+    document.body.classList.remove("lightbox-open");
+  };
+
+  overlay.addEventListener("click", (event) => {
+    if (event.target === overlay) {
+      closeLightbox();
+    }
+  });
+
+  prevButton.addEventListener("click", (event) => {
+    event.stopPropagation();
+    showImageAtIndex(activeLightboxIndex - 1);
+  });
+
+  nextButton.addEventListener("click", (event) => {
+    event.stopPropagation();
+    showImageAtIndex(activeLightboxIndex + 1);
+  });
+
+  let touchStartX = 0;
+  let touchStartY = 0;
+  let swipeActive = false;
+
+  image.addEventListener("touchstart", (event) => {
+    if (!overlay.classList.contains("open") || event.touches.length !== 1) return;
+    touchStartX = event.touches[0].clientX;
+    touchStartY = event.touches[0].clientY;
+    swipeActive = true;
+  }, { passive: true });
+
+  image.addEventListener("touchend", (event) => {
+    if (!swipeActive || !overlay.classList.contains("open") || !galleryImageElements.length) return;
+    const touch = event.changedTouches[0];
+    const deltaX = touch.clientX - touchStartX;
+    const deltaY = touch.clientY - touchStartY;
+    const isHorizontalSwipe = Math.abs(deltaX) > 50 && Math.abs(deltaX) > Math.abs(deltaY) * 1.3;
+
+    if (isHorizontalSwipe) {
+      if (deltaX < 0) {
+        showImageAtIndex(activeLightboxIndex + 1);
+      } else {
+        showImageAtIndex(activeLightboxIndex - 1);
+      }
+    }
+
+    swipeActive = false;
+  }, { passive: true });
+
+  image.addEventListener("touchcancel", () => {
+    swipeActive = false;
+  }, { passive: true });
+
+  document.addEventListener("keydown", (event) => {
+    if (!overlay.classList.contains("open")) return;
+
+    if (event.key === "Escape") {
+      closeLightbox();
+      return;
+    }
+
+    if ((event.key === "ArrowLeft" || event.key === "ArrowRight") && galleryImageElements.length) {
+      showImageAtIndex(event.key === "ArrowLeft" ? activeLightboxIndex - 1 : activeLightboxIndex + 1);
+    }
+  });
+
+  lightboxElements = { overlay, image, closeLightbox, showImageAtIndex };
+  return lightboxElements;
+}
+
+function openLightbox(sourceImage) {
+  const { overlay, showImageAtIndex } = initializeLightbox();
+  activeLightboxIndex = galleryImageElements.indexOf(sourceImage);
+  showImageAtIndex(activeLightboxIndex);
+  overlay.classList.add("open");
+  overlay.setAttribute("aria-hidden", "false");
+  document.body.classList.add("lightbox-open");
+}
+
 // Wire up language buttons
 document.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll(".lang-btn").forEach((btn) => {
@@ -115,6 +240,7 @@ async function renderGallery() {
   if (!galleryGrid) return;
   
   galleryGrid.innerHTML = ""; // Clear existing content
+  galleryImageElements = [];
 
   try {
     let galleryImages = Array.isArray(window.GALLERY_IMAGES) ? window.GALLERY_IMAGES : null;
@@ -140,6 +266,8 @@ async function renderGallery() {
       img.alt = "Kisaki Calligraphy Artwork"; // Generic alt text
       img.className = "artwork-image";
       img.loading = "lazy"; // Performance optimization
+      galleryImageElements.push(img);
+      img.addEventListener("click", () => openLightbox(img));
   
       // Assemble
       article.appendChild(img);
