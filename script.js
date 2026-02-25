@@ -11,18 +11,6 @@ const translations = {
     hero_subtitle: "The art of the brush — where silence becomes form.",
     hero_cta: "View Gallery",
     gallery_title: "Gallery",
-    artwork1_title: "Tranquility",
-    artwork1_meta: "Ink on washi · 2024",
-    artwork2_title: "Flow",
-    artwork2_meta: "Ink on silk · 2024",
-    artwork3_title: "Breath",
-    artwork3_meta: "Ink on washi · 2023",
-    artwork4_title: "Stillness",
-    artwork4_meta: "Ink on rice paper · 2023",
-    artwork5_title: "Infinity",
-    artwork5_meta: "Ink on silk · 2022",
-    artwork6_title: "Dawn",
-    artwork6_meta: "Ink on washi · 2022",
     about_title: "About",
     about_text: `Calligraphy Artist - Kisaki -
 
@@ -44,7 +32,7 @@ My hope is that calligraphy art becomes something that people of all generations
     contact_title: "Contact",
     contact_email_label: "Email",
     contact_instagram_label: "Instagram",
-    footer_copy: "© 2024 Kisaki. All rights reserved.",
+    footer_copy: "© 2026 Kisaki. All rights reserved.",
   },
   ja: {
     nav_gallery: "ギャラリー",
@@ -54,18 +42,6 @@ My hope is that calligraphy art becomes something that people of all generations
     hero_subtitle: "筆の芸術 — 静寂が形になる瞬間。",
     hero_cta: "作品を見る",
     gallery_title: "ギャラリー",
-    artwork1_title: "静寂",
-    artwork1_meta: "墨・和紙 · 2024年",
-    artwork2_title: "流れ",
-    artwork2_meta: "墨・絹 · 2024年",
-    artwork3_title: "息吹",
-    artwork3_meta: "墨・和紙 · 2023年",
-    artwork4_title: "静止",
-    artwork4_meta: "墨・和紙 · 2023年",
-    artwork5_title: "無限",
-    artwork5_meta: "墨・絹 · 2022年",
-    artwork6_title: "夜明け",
-    artwork6_meta: "墨・和紙 · 2022年",
     about_title: "プロフィール",
     about_text: `書道アーティスト妃 - Kisaki -
 
@@ -88,7 +64,7 @@ My hope is that calligraphy art becomes something that people of all generations
     contact_title: "お問い合わせ",
     contact_email_label: "メール",
     contact_instagram_label: "インスタグラム",
-    footer_copy: "© 2024 妃（Kisaki）. 無断転載禁止。",
+    footer_copy: "© 2026 妃（Kisaki）. 無断転載禁止。",
   },
 };
 
@@ -125,4 +101,52 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Apply persisted language on load
   setLang(currentLang);
+  
+  // Render Gallery
+  renderGallery();
 });
+
+// ============================================================
+// Dynamic Gallery Loading
+// ============================================================
+
+async function renderGallery() {
+  const galleryGrid = document.getElementById("gallery-grid");
+  if (!galleryGrid) return;
+  
+  galleryGrid.innerHTML = ""; // Clear existing content
+
+  try {
+    let galleryImages = Array.isArray(window.GALLERY_IMAGES) ? window.GALLERY_IMAGES : null;
+
+    if (!galleryImages) {
+      const response = await fetch("gallery.json");
+      if (!response.ok) throw new Error("Failed to load gallery manifest");
+      galleryImages = await response.json();
+    }
+
+    if (!Array.isArray(galleryImages)) {
+      throw new Error("Invalid gallery manifest format");
+    }
+    
+    galleryImages.forEach(filename => {
+      // Create card
+      const article = document.createElement("article");
+      article.className = "artwork-card";
+  
+      // Create image
+      const img = document.createElement("img");
+      img.src = `assets/gallery/${filename}`;
+      img.alt = "Kisaki Calligraphy Artwork"; // Generic alt text
+      img.className = "artwork-image";
+      img.loading = "lazy"; // Performance optimization
+  
+      // Assemble
+      article.appendChild(img);
+      galleryGrid.appendChild(article);
+    });
+  } catch (error) {
+    console.error('Error loading gallery:', error);
+    galleryGrid.innerHTML = '<p class="error-message">Unable to load gallery images.</p>';
+  }
+}
