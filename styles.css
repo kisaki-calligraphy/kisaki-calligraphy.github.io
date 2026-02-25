@@ -223,9 +223,14 @@ section {
 }
 
 /* ---- Gallery ---- */
+#gallery {
+  position: relative;
+}
+
 .gallery-grid {
   column-count: 3;
   column-gap: 1.5rem;
+  position: relative;
 }
 
 @media (max-width: 900px) {
@@ -246,13 +251,30 @@ section {
   border-radius: var(--radius);
   overflow: hidden;
   box-shadow: 0 2px 8px var(--shadow);
-  transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), 
-              box-shadow 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  transition: transform 0.44s cubic-bezier(0.22, 1, 0.36, 1), 
+              box-shadow 0.44s cubic-bezier(0.22, 1, 0.36, 1),
+              opacity 0.42s cubic-bezier(0.22, 1, 0.36, 1),
+              filter 0.42s cubic-bezier(0.22, 1, 0.36, 1);
   cursor: pointer;
   break-inside: avoid;
   margin-bottom: 1.5rem;
   display: inline-block; /* Ensure consistent rendering across browsers */
   width: 100%;
+}
+
+.artwork-card.is-hidden {
+  display: none;
+}
+
+.artwork-card.is-entering,
+.artwork-card.is-collapsing {
+  opacity: 0;
+  filter: blur(1.2px);
+}
+
+.artwork-card.is-entering .artwork-image,
+.artwork-card.is-collapsing .artwork-image {
+  transform: scale(0.992);
 }
 
 .artwork-image {
@@ -312,6 +334,58 @@ section {
   color: var(--muted);
   margin-top: 0.25rem;
   font-style: italic;
+}
+
+#gallery.gallery-collapsed .gallery-grid::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 140px;
+  background: linear-gradient(to bottom, rgba(249, 245, 238, 0), var(--paper));
+  pointer-events: none;
+  transition: opacity 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.gallery-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 1.1rem;
+}
+
+.gallery-toggle-btn {
+  border: 1px solid var(--border);
+  background: linear-gradient(180deg, #fff 0%, #f4eee4 100%);
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 0.92rem;
+  letter-spacing: 0.04em;
+  padding: 0.68rem 1.35rem;
+  border-radius: 999px;
+  box-shadow: 0 8px 18px var(--shadow);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition);
+}
+
+.gallery-toggle-btn::after {
+  content: "↓";
+  font-size: 0.95rem;
+  line-height: 1;
+  transition: transform var(--transition);
+}
+
+#gallery:not(.gallery-collapsed) .gallery-toggle-btn::after {
+  transform: rotate(180deg);
+}
+
+.gallery-toggle-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
+  border-color: #b8ab97;
 }
 
 /* ---- Lightbox ---- */

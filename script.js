@@ -11,6 +11,8 @@ const translations = {
     hero_subtitle: "The art of the brush — where silence becomes form.",
     hero_cta: "View Gallery",
     gallery_title: "Gallery",
+    gallery_show_more: "Show more",
+    gallery_show_less: "Show less",
     about_title: "About",
     about_text: `Calligraphy Artist - Kisaki -
 
@@ -42,6 +44,8 @@ My hope is that calligraphy art becomes something that people of all generations
     hero_subtitle: "筆の芸術 — 静寂が形になる瞬間。",
     hero_cta: "作品を見る",
     gallery_title: "ギャラリー",
+    gallery_show_more: "もっと見る",
+    gallery_show_less: "閉じる",
     about_title: "プロフィール",
     about_text: `書道アーティスト妃 - Kisaki -
 
@@ -72,6 +76,19 @@ let currentLang = localStorage.getItem("kisaki_lang") || "en";
 let lightboxElements = null;
 let galleryImageElements = [];
 let activeLightboxIndex = -1;
+let isGalleryExpanded = false;
+let isGalleryAnimating = false;
+const GALLERY_ANIMATION_STEP_MS = 22;
+const GALLERY_MAX_STAGGER_MS = 140;
+const GALLERY_BASE_DURATION_MS = 420;
+
+function setCardTransitionDelay(card, delayMs) {
+  card.style.transitionDelay = `${Math.max(0, delayMs)}ms`;
+}
+
+function clearCardTransitionDelay(card) {
+  card.style.transitionDelay = "";
+}
 
 function applyTranslations(lang) {
   const t = translations[lang];
@@ -84,11 +101,102 @@ function applyTranslations(lang) {
   document.documentElement.lang = lang === "ja" ? "ja" : "en";
 }
 
+function getGalleryColumnCount() {
+  if (window.innerWidth <= 600) return 1;
+  if (window.innerWidth <= 900) return 2;
+  return 3;
+}
+
+function getGalleryInitialVisibleCount() {
+  return getGalleryColumnCount() * 3;
+}
+
+function updateGalleryToggleLabel() {
+  const button = document.getElementById("gallery-toggle-btn");
+  if (!button) return;
+
+  const t = translations[currentLang] || translations.en;
+  button.textContent = isGalleryExpanded ? t.gallery_show_less : t.gallery_show_more;
+}
+
+function applyGalleryPreviewLimit() {
+  const section = document.getElementById("gallery");
+  const button = document.getElementById("gallery-toggle-btn");
+  const galleryGrid = document.getElementById("gallery-grid");
+  if (!section || !button || !galleryGrid) return;
+
+  const cards = Array.from(galleryGrid.querySelectorAll(".artwork-card"));
+  const visibleCount = getGalleryInitialVisibleCount();
+  const hasOverflow = cards.length > visibleCount;
+
+  if (!hasOverflow) {
+    cards.forEach((card) => {
+      card.classList.remove("is-hidden", "is-entering", "is-collapsing");
+    });
+    button.hidden = true;
+    section.classList.remove("gallery-collapsed");
+    return;
+  }
+
+  button.hidden = false;
+
+  if (isGalleryExpanded) {
+    const hiddenCards = cards.filter((_, index) => index >= visibleCount);
+    hiddenCards.forEach((card, index) => {
+      const delay = Math.min(index * GALLERY_ANIMATION_STEP_MS, GALLERY_MAX_STAGGER_MS);
+      setCardTransitionDelay(card, delay);
+      card.classList.remove("is-hidden", "is-collapsing");
+      card.classList.add("is-entering");
+    });
+
+    section.classList.remove("gallery-collapsed");
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        hiddenCards.forEach((card) => card.classList.remove("is-entering"));
+      });
+    });
+
+    if (hiddenCards.length) {
+      isGalleryAnimating = true;
+      window.setTimeout(() => {
+        hiddenCards.forEach(clearCardTransitionDelay);
+        isGalleryAnimating = false;
+      }, GALLERY_BASE_DURATION_MS + GALLERY_MAX_STAGGER_MS);
+    }
+  } else {
+    const cardsToHide = cards.filter((card, index) => index >= visibleCount && !card.classList.contains("is-hidden"));
+
+    section.classList.add("gallery-collapsed");
+    cardsToHide.forEach((card, index) => {
+      const reverseIndex = cardsToHide.length - 1 - index;
+      const delay = Math.min(reverseIndex * GALLERY_ANIMATION_STEP_MS, GALLERY_MAX_STAGGER_MS);
+      setCardTransitionDelay(card, delay);
+      card.classList.remove("is-entering");
+      card.classList.add("is-collapsing");
+    });
+
+    if (cardsToHide.length) {
+      isGalleryAnimating = true;
+      window.setTimeout(() => {
+        cardsToHide.forEach((card) => {
+          card.classList.add("is-hidden");
+          card.classList.remove("is-collapsing");
+          clearCardTransitionDelay(card);
+        });
+        isGalleryAnimating = false;
+      }, GALLERY_BASE_DURATION_MS + GALLERY_MAX_STAGGER_MS);
+    }
+  }
+
+  updateGalleryToggleLabel();
+}
+
 function setLang(lang) {
   if (!translations[lang]) return;
   currentLang = lang;
   localStorage.setItem("kisaki_lang", lang);
   applyTranslations(lang);
+  updateGalleryToggleLabel();
 
   // Update button states
   document.querySelectorAll(".lang-btn").forEach((btn) => {
@@ -229,6 +337,21 @@ document.addEventListener("DOMContentLoaded", () => {
   
   // Render Gallery
   renderGallery();
+
+  const galleryToggleButton = document.getElementById("gallery-toggle-btn");
+  if (galleryToggleButton) {
+    galleryToggleButton.addEventListener("click", () => {
+      if (isGalleryAnimating) return;
+      isGalleryExpanded = !isGalleryExpanded;
+      applyGalleryPreviewLimit();
+    });
+  }
+
+  window.addEventListener("resize", () => {
+    if (!isGalleryExpanded) {
+      applyGalleryPreviewLimit();
+    }
+  });
 });
 
 // ============================================================
@@ -241,6 +364,7 @@ async function renderGallery() {
   
   galleryGrid.innerHTML = ""; // Clear existing content
   galleryImageElements = [];
+  isGalleryExpanded = false;
 
   try {
     let galleryImages = Array.isArray(window.GALLERY_IMAGES) ? window.GALLERY_IMAGES : null;
@@ -273,6 +397,8 @@ async function renderGallery() {
       article.appendChild(img);
       galleryGrid.appendChild(article);
     });
+
+    applyGalleryPreviewLimit();
   } catch (error) {
     console.error('Error loading gallery:', error);
     galleryGrid.innerHTML = '<p class="error-message">Unable to load gallery images.</p>';
