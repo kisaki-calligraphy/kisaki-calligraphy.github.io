@@ -108,7 +108,7 @@ function getGalleryColumnCount() {
 }
 
 function getGalleryInitialVisibleCount() {
-  return getGalleryColumnCount() * 3;
+  return getGalleryColumnCount();
 }
 
 function updateGalleryToggleLabel() {
