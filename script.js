@@ -326,6 +326,30 @@ function openLightbox(sourceImage) {
   document.body.classList.add("lightbox-open");
 }
 
+function initializeGalleryNextButton() {
+  const button = document.getElementById("gallery-next-btn");
+  const gallerySection = document.getElementById("gallery");
+  const aboutSection = document.getElementById("about");
+  if (!button || !gallerySection || !aboutSection) return;
+
+  button.addEventListener("click", () => {
+    aboutSection.scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      const entry = entries[0];
+      const shouldShow = entry.isIntersecting;
+      button.classList.toggle("is-visible", shouldShow);
+    },
+    {
+      threshold: 0,
+    },
+  );
+
+  observer.observe(gallerySection);
+}
+
 // Wire up language buttons
 document.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll(".lang-btn").forEach((btn) => {
@@ -337,6 +361,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
   // Render Gallery
   renderGallery();
+  initializeGalleryNextButton();
 
   const galleryToggleButton = document.getElementById("gallery-toggle-btn");
   if (galleryToggleButton) {
