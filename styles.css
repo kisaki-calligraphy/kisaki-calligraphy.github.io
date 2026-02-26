@@ -355,9 +355,9 @@ section {
 }
 
 .gallery-toggle-btn {
-  border: 1px solid var(--border);
-  background: linear-gradient(180deg, #fff 0%, var(--paper) 100%);
-  color: var(--ink);
+  border: 2px solid var(--accent);
+  background: linear-gradient(180deg, var(--card-bg) 0%, var(--paper) 100%);
+  color: var(--accent);
   font-family: inherit;
   font-size: 0.92rem;
   letter-spacing: 0.04em;
@@ -382,10 +382,16 @@ section {
   transform: rotate(180deg);
 }
 
+#gallery:not(.gallery-collapsed) .gallery-toggle-btn {
+  background: linear-gradient(180deg, var(--paper) 0%, var(--card-bg) 100%);
+  border-color: var(--accent-light);
+  color: var(--ink);
+}
+
 .gallery-toggle-btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
-  border-color: #b8ab97;
+  border-color: var(--accent-light);
 }
 
 /* ---- Lightbox ---- */
