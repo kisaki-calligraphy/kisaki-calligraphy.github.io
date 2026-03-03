@@ -72,7 +72,24 @@ My hope is that calligraphy art becomes something that people of all generations
   },
 };
 
-let currentLang = localStorage.getItem("kisaki_lang") || "en";
+function getBrowserPreferredLang() {
+  const preferredLanguages = Array.isArray(navigator.languages) && navigator.languages.length
+    ? navigator.languages
+    : [navigator.language];
+
+  return preferredLanguages.some((lang) => String(lang).toLowerCase().startsWith("ja")) ? "ja" : "en";
+}
+
+function getInitialLang() {
+  const persistedLang = localStorage.getItem("kisaki_lang");
+  if (persistedLang && translations[persistedLang]) {
+    return persistedLang;
+  }
+
+  return getBrowserPreferredLang();
+}
+
+let currentLang = getInitialLang();
 let lightboxElements = null;
 let galleryImageElements = [];
 let activeLightboxIndex = -1;
