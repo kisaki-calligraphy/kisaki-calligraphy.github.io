@@ -8,6 +8,7 @@ const translations = {
     nav_shop: "Shop",
     nav_about: "About",
     nav_contact: "Contact",
+    events_title: "Event information",
     hero_title: "Kisaki",
     hero_subtitle: "The art of the brush — where silence becomes form.",
     hero_cta: "View Gallery",
@@ -42,6 +43,7 @@ My hope is that calligraphy art becomes something that people of all generations
     nav_shop: "ショップ",
     nav_about: "プロフィール",
     nav_contact: "お問い合わせ",
+    events_title: "イベントのお知らせ",
     hero_title: "妃",
     hero_subtitle: "筆の芸術 — 静寂が形になる瞬間。",
     hero_cta: "作品を見る",
@@ -97,9 +99,11 @@ let galleryImageElements = [];
 let activeLightboxIndex = -1;
 let isGalleryExpanded = false;
 let isGalleryAnimating = false;
+let eventSliderIntervalId = null;
 const GALLERY_ANIMATION_STEP_MS = 22;
 const GALLERY_MAX_STAGGER_MS = 140;
 const GALLERY_BASE_DURATION_MS = 420;
+const EVENT_SLIDE_INTERVAL_MS = 4500;
 
 function setCardTransitionDelay(card, delayMs) {
   card.style.transitionDelay = `${Math.max(0, delayMs)}ms`;
@@ -377,6 +381,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Apply persisted language on load
   setLang(currentLang);
+  renderEventsSlider();
   
   // Render Gallery
   renderGallery();
@@ -397,6 +402,139 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 });
+
+// ============================================================
+// Dynamic Events Slider Loading
+// ============================================================
+
+async function renderEventsSlider() {
+  const eventsSlides = document.getElementById("events-slides");
+  const eventsDots = document.getElementById("events-dots");
+  if (!eventsSlides || !eventsDots) return;
+
+  eventsSlides.innerHTML = "";
+  eventsDots.innerHTML = "";
+
+  if (eventSliderIntervalId !== null) {
+    window.clearInterval(eventSliderIntervalId);
+    eventSliderIntervalId = null;
+  }
+
+  try {
+    let eventImages = Array.isArray(window.EVENT_IMAGES) ? window.EVENT_IMAGES : null;
+
+    if (!eventImages) {
+      const response = await fetch("events.json");
+      if (!response.ok) throw new Error("Failed to load events manifest");
+      eventImages = await response.json();
+    }
+
+    if (!Array.isArray(eventImages)) {
+      throw new Error("Invalid events manifest format");
+    }
+
+    if (!eventImages.length) return;
+
+    eventImages.forEach((filename, index) => {
+      const slide = document.createElement("div");
+      slide.className = "event-slide";
+      if (index === 0) {
+        slide.classList.add("is-active");
+      }
+
+      const img = document.createElement("img");
+      img.src = `assets/events/${filename}`;
+      img.alt = "Event information";
+      img.loading = index === 0 ? "eager" : "lazy";
+
+      slide.appendChild(img);
+      eventsSlides.appendChild(slide);
+
+      const dotButton = document.createElement("button");
+      dotButton.type = "button";
+      dotButton.className = "events-dot";
+      dotButton.setAttribute("aria-label", `Show event slide ${index + 1}`);
+      dotButton.setAttribute("title", `Slide ${index + 1}`);
+      dotButton.dataset.index = String(index);
+      if (index === 0) {
+        dotButton.classList.add("is-active");
+      }
+      eventsDots.appendChild(dotButton);
+    });
+
+    let currentIndex = 0;
+    const slides = Array.from(eventsSlides.querySelectorAll(".event-slide"));
+    const dots = Array.from(eventsDots.querySelectorAll(".events-dot"));
+
+    const stopEventsAutoplay = () => {
+      if (eventSliderIntervalId !== null) {
+        window.clearInterval(eventSliderIntervalId);
+        eventSliderIntervalId = null;
+      }
+    };
+
+    const showSlideAtIndex = (index) => {
+      if (!slides.length) return;
+      const nextIndex = (index + slides.length) % slides.length;
+      slides[currentIndex].classList.remove("is-active");
+      dots[currentIndex].classList.remove("is-active");
+      currentIndex = nextIndex;
+      slides[currentIndex].classList.add("is-active");
+      dots[currentIndex].classList.add("is-active");
+    };
+
+    dots.forEach((dot) => {
+      dot.addEventListener("click", () => {
+        stopEventsAutoplay();
+        const requestedIndex = Number(dot.dataset.index);
+        if (!Number.isNaN(requestedIndex)) {
+          showSlideAtIndex(requestedIndex);
+        }
+      });
+    });
+
+    eventsSlides.addEventListener("click", stopEventsAutoplay);
+
+    let swipeStartX = 0;
+    let swipeStartY = 0;
+    let swipeActive = false;
+
+    eventsSlides.addEventListener("touchstart", (event) => {
+      if (event.touches.length !== 1) return;
+      swipeStartX = event.touches[0].clientX;
+      swipeStartY = event.touches[0].clientY;
+      swipeActive = true;
+    }, { passive: true });
+
+    eventsSlides.addEventListener("touchend", (event) => {
+      if (!swipeActive || !event.changedTouches.length) return;
+
+      const touch = event.changedTouches[0];
+      const deltaX = touch.clientX - swipeStartX;
+      const deltaY = touch.clientY - swipeStartY;
+      const isHorizontalSwipe = Math.abs(deltaX) > 50 && Math.abs(deltaX) > Math.abs(deltaY) * 1.3;
+
+      if (isHorizontalSwipe) {
+        stopEventsAutoplay();
+        showSlideAtIndex(deltaX < 0 ? currentIndex + 1 : currentIndex - 1);
+      }
+
+      swipeActive = false;
+    }, { passive: true });
+
+    eventsSlides.addEventListener("touchcancel", () => {
+      swipeActive = false;
+    }, { passive: true });
+
+    if (eventImages.length <= 1) return;
+
+    eventSliderIntervalId = window.setInterval(() => {
+      showSlideAtIndex(currentIndex + 1);
+    }, EVENT_SLIDE_INTERVAL_MS);
+  } catch (error) {
+    console.error("Error loading events:", error);
+  }
+}
 
 // ============================================================
 // Dynamic Gallery Loading
