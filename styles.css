@@ -74,6 +74,12 @@ nav {
   color: #fff;
   backdrop-filter: blur(6px);
   border-bottom: 1px solid #333;
+  transition: transform var(--transition);
+  will-change: transform;
+}
+
+nav.nav-hidden {
+  transform: translateY(calc(-100% - 1px));
 }
 
 .nav-logo {
@@ -731,8 +737,33 @@ footer a:hover {
 
 /* ---- Responsive ---- */
 @media (max-width: 700px) {
+  nav {
+    height: auto;
+    padding: 0.5rem 1rem;
+    flex-wrap: wrap;
+    gap: 0.5rem 0.75rem;
+  }
+
+  .nav-logo {
+    order: 1;
+  }
+
   .nav-links {
-    display: none;
+    order: 3;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem 1rem;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .nav-links a {
+    font-size: 0.9rem;
+  }
+
+  .lang-switcher {
+    order: 2;
+    margin-left: auto;
   }
 
   .about-inner {

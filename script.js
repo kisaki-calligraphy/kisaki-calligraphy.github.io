@@ -373,6 +373,36 @@ function initializeGalleryNextButton() {
   observer.observe(gallerySection);
 }
 
+function initializeNavbarScrollBehavior() {
+  const nav = document.querySelector("nav");
+  if (!nav) return;
+
+  let lastScrollY = window.scrollY;
+  let ticking = false;
+  const MIN_DELTA_PX = 4;
+  const HIDE_AFTER_PX = 80;
+
+  const updateNavbarVisibility = () => {
+    const currentScrollY = window.scrollY;
+    const deltaY = currentScrollY - lastScrollY;
+
+    if (currentScrollY <= 20 || deltaY < -MIN_DELTA_PX) {
+      nav.classList.remove("nav-hidden");
+    } else if (deltaY > MIN_DELTA_PX && currentScrollY > HIDE_AFTER_PX) {
+      nav.classList.add("nav-hidden");
+    }
+
+    lastScrollY = currentScrollY;
+    ticking = false;
+  };
+
+  window.addEventListener("scroll", () => {
+    if (ticking) return;
+    ticking = true;
+    window.requestAnimationFrame(updateNavbarVisibility);
+  }, { passive: true });
+}
+
 // Wire up language buttons
 document.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll(".lang-btn").forEach((btn) => {
@@ -386,6 +416,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Render Gallery
   renderGallery();
   initializeGalleryNextButton();
+  initializeNavbarScrollBehavior();
 
   const galleryToggleButton = document.getElementById("gallery-toggle-btn");
   if (galleryToggleButton) {
