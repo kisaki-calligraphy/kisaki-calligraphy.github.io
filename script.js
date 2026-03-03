@@ -5,6 +5,7 @@
 const translations = {
   en: {
     nav_gallery: "Gallery",
+    nav_shop: "Shop",
     nav_about: "About",
     nav_contact: "Contact",
     hero_title: "Kisaki",
@@ -38,6 +39,7 @@ My hope is that calligraphy art becomes something that people of all generations
   },
   ja: {
     nav_gallery: "ギャラリー",
+    nav_shop: "ショップ",
     nav_about: "プロフィール",
     nav_contact: "お問い合わせ",
     hero_title: "妃",
