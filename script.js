@@ -4,6 +4,7 @@
 
 const translations = {
   en: {
+    nav_event: "Event",
     nav_gallery: "Gallery",
     nav_shop: "Shop",
     nav_about: "About",
@@ -11,7 +12,7 @@ const translations = {
     events_title: "Event information",
     hero_title: "Kisaki",
     hero_subtitle: "The art of the brush — where silence becomes form.",
-    hero_cta: "View Gallery",
+    hero_cta: "Visit Shop",
     gallery_title: "Gallery",
     gallery_show_more: "Show more",
     gallery_show_less: "Show less",
@@ -39,6 +40,7 @@ My hope is that calligraphy art becomes something that people of all generations
     footer_copy: "© 2026 Kisaki. All rights reserved.",
   },
   ja: {
+    nav_event: "イベント",
     nav_gallery: "ギャラリー",
     nav_shop: "ショップ",
     nav_about: "プロフィール",
@@ -46,7 +48,7 @@ My hope is that calligraphy art becomes something that people of all generations
     events_title: "イベントのお知らせ",
     hero_title: "妃",
     hero_subtitle: "筆の芸術 — 静寂が形になる瞬間。",
-    hero_cta: "作品を見る",
+    hero_cta: "ショップを見る",
     gallery_title: "ギャラリー",
     gallery_show_more: "もっと見る",
     gallery_show_less: "閉じる",
