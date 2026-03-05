@@ -83,15 +83,15 @@ nav.nav-hidden {
 }
 
 .nav-logo {
-  font-size: 1.5rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  color: #fff;
+  display: inline-flex;
+  align-items: center;
   text-decoration: none;
 }
 
-.nav-logo span {
-  color: var(--accent);
+.nav-logo img {
+  display: block;
+  height: 40px;
+  width: auto;
 }
 
 .nav-links {
@@ -805,6 +805,10 @@ footer a:hover {
 
   .nav-logo {
     order: 1;
+  }
+
+  .nav-logo img {
+    height: 34px;
   }
 
   .nav-actions {
